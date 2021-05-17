@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/javascript;charset=utf-8" http-equiv="Content-Type">
+    <title>Context in visual categorization</title>
+
+    <script src="jspsych-6.2.0/jspsych.js"></script>
+    <script src="jspsych-6.2.0/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="jspsych-6.2.0/plugins/jspsych-image-keyboard-response.js"></script>
+    <script src="jspsych-6.2.0/plugins/jspsych-categorize-image.js"></script>
+    <link href="jspsych-6.2.0/css/jspsych.css" rel= "stylesheet" type="text/css">
+    
+  </head>
+  <body>
+   
+  </body>
+  <script type="application/javascript">
+  var images = ['stimulus/A1_U.png','stimulus/A1_N.png','stimulus/A2_U.png','stimulus/A2_N.png','stimulus/A3_U.png','stimulus/A3_N.png', 'stimulus/A4_U.png','stimulus/A4_N.png','stimulus/A5_U.png','stimulus/A5_N.png', 'stimulus/A6_U.png','stimulus/A6_N.png','stimulus/A7_U.png','stimulus/A7_N.png','stimulus/B8_U.png','stimulus/B9_U.png','stimulus/B9_N.png','stimulus/B10_U.png', 'stimulus/B10_N.png','stimulus/B11_U.png','stimulus/B11_N.png','stimulus/B12_U.png','stimulus/B12_N.png', 'stimulus/B13_U.png', 'stimulus/B13_N.png', 'stimulus/B14_U.png', 'stimulus/B14_N.png'];
+
+  console.log(jsPsych);
+    id = prompt("Please enter you name")
+    exp_subjects = [] //list of subjects assigned to the experimental group
+    control_subjects = [] //list of subjects assigned to the control group
+    var exp = false
+    r = Math.random()
+    if(r>0.5){
+      exp = true //randomly assigning a subject to experimental group
+      exp_subjects.push(id)
+    }
+    else{
+      control_subjects.push(id)
+    }
+
+    var no_trials = 0
+    var score = 0
+    /* create timeline */
+    var timeline = [];
+
+    /* define welcome message trial */
+    var welcome = {
+      type: "html-keyboard-response",
+      stimulus: `Welcome ${id}. Press any key to continue.`
+    };
+    timeline.push(welcome);
+
+    /* define instructions trial */
+    var instructions = {
+      type: "html-keyboard-response",
+      stimulus: "<p>In this experiment, you will see a series of line drawings of bugs which can be classified either as Category A bugs or as Category B bugs.<br>Each bug can either appear in a natural or urban setting. Your job is to look carefully at each bug and decide if it belongs to Category A or Category B.</p> <p>Press “a” on the keyboard if you think it is a Category A bug and “b” if you think it is a Category B bug.<br> At first, the task will seem quite difficult, but with time and practice, you should be able to answer correctly</p><p>Press any key to continue</p>",
+    };
+    timeline.push(instructions);
+
+    let train_set = new Set()
+    var train_stimuli = [];
+    //Adding prototypes
+    train_set.add(1)
+    train_set.add(8)
+    while(train_set.size !=6){
+      train_set.add(Math.round((Math.random() * 5) + 2)); //Generate a random number between 2 and 7
+    }
+
+    while(train_set.size !=10){
+      train_set.add(Math.round((Math.random() * 5) + 9)); //Generate a random number between 9 and 14
+    }
+
+    console.log(train_set)
+    ja = 0 
+    jb = 0
+    for(i of train_set){
+      if(i<8){ //Category A stimulus
+
+      if(ja<3){ //Three stimuli should be from urban background
+        train_stimuli.push({ stimulus: `stimulus/A${i}_U.png`, data: {total: 'exp',test_part: 'train',correct_response: 'A' }, correct_response: 'A', correct_key:65});
+        ja+=1
+      }  
+      else{ //Remaining two stimuli should be from natural background
+      train_stimuli.push({ stimulus: `stimulus/A${i}_N.png`, data: {total: 'exp',test_part: 'train',correct_response: 'A' }, correct_response: 'A', correct_key:65});
+      ja+=1
+      }
+
+    }
+      else{
+        if(jb<3){
+        train_stimuli.push({ stimulus: `stimulus/B${i}_N.png`, data: {total: 'exp',test_part: 'train', correct_response: 'B'}, correct_response: 'B', correct_key: 66});
+        jb+=1
+      }
+      else{
+        train_stimuli.push({ stimulus: `stimulus/B${i}_U.png`, data: {total: 'exp',test_part: 'train', correct_response: 'B'}, correct_response: 'B', correct_key: 66});
+        jb+=1
+      }
+      }
+
+    }
+
+    let test_set = new Set()
+    var test_stimuli_control = [];
+    var test_stimuli_exp = [];
+
+    while(test_set.size !=5){
+      n = Math.round((Math.random() * 5) + 2) //Generate a random number between 2 and 7
+      test_set.add(n) 
+    }
+
+    while(test_set.size !=10){
+      n = Math.round((Math.random() * 5) + 9) //Generate a random number between 8 and 14
+      test_set.add(n) 
+    }
+
+    console.log("Hello")
+    //Control group
+    ja = 0 
+    jb = 0
+    for(i of test_set){
+      console.log(i)
+      if(i<8){ //Category A stimulus
+      if(ja<3){ //Three stimuli should be from urban background
+        test_stimuli_control.push({ stimulus: `stimulus/A${i}_U.png`, data: {total: 'exp',test_part: 'test',correct_response: 'A' }, correct_response: 'A', correct_key:65});
+        ja+=1
+      }  
+      else{ //Remaining two stimuli should be from natural background
+      test_stimuli_control.push({ stimulus: `stimulus/A${i}_N.png`, data: {total: 'exp',test_part: 'test',correct_response: 'A' }, correct_response: 'A', correct_key:65});
+      ja+=1
+      }
+
+    }
+      else{
+        if(jb<3){
+        test_stimuli_control.push({ stimulus: `stimulus/B${i}_N.png`, data: {total: 'exp',test_part: 'train', correct_response: 'B'}, correct_response: 'B', correct_key: 66});
+        jb+=1
+      }
+      else{
+        test_stimuli_control.push({ stimulus: `stimulus/B${i}_U.png`, data: {total: 'exp',test_part: 'train', correct_response: 'B'}, correct_response: 'B', correct_key: 66});
+        jb+=1
+      }
+      }
+    }
+
+    //Experimental group
+    ja = 0 
+    jb = 0
+    for(i of test_set){
+      if(i<8){ //Category A stimulus
+      if(ja<3){ //Three stimuli should be from natural background
+        test_stimuli_exp.push({ stimulus: `stimulus/A${i}_N.png`, data: {total: 'exp',test_part: 'test',correct_response: 'A' }, correct_response: 'A', correct_key:65});
+        ja+=1
+      }  
+      else{ //Remaining two stimuli should be from urban background
+      test_stimuli_exp.push({ stimulus: `stimulus/A${i}_U.png`, data: {total: 'exp',test_part: 'test',correct_response: 'A' }, correct_response: 'A', correct_key:65});
+      ja+=1
+      }
+
+    }
+      else{
+        if(jb<3){
+        test_stimuli_exp.push({ stimulus: `stimulus/B${i}_U.png`, data: {total: 'exp',test_part: 'train', correct_response: 'B'}, correct_response: 'B', correct_key: 66});
+        jb+=1
+      }
+      else{
+        test_stimuli_exp.push({ stimulus: `stimulus/B${i}_N.png`, data: {total: 'exp',test_part: 'train', correct_response: 'B'}, correct_response: 'B', correct_key: 66});
+        jb+=1
+      }
+      }
+    }
+
+
+    console.log(train_stimuli)
+    console.log(test_stimuli_control)
+    console.log(test_stimuli_exp)
+
+
+    var fixation = {
+      type: 'html-keyboard-response',
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: jsPsych.NO_KEYS,
+      trial_duration: function(){
+      return jsPsych.randomization.sampleWithoutReplacement([600, 800], 1)[0];
+      },
+      data: {test_part: 'fixation'}
+      
+}
+    /* trials */
+    var train_trials = {
+      type: "categorize-image",
+      stimulus: jsPsych.timelineVariable('stimulus'),
+    
+      choices: [65, 66],
+      key_answer: jsPsych.timelineVariable('correct_key'),
+      text_answer : jsPsych.timelineVariable('correct_response'),
+      data: jsPsych.timelineVariable('data'),
+      correct_text: `<p class='prompt' style= "font-size:150%; color:green"><strong>Correct!</strong> This bug is of Category %ANS%.</p>`,
+      incorrect_text: `<p class='prompt' style = "font-size:150%; color:red"><strong>Incorrect</strong> This bug is of Category %ANS%.</p>`,
+      feedback_duration: 2000,
+      prompt: "<p style = font-size:120%>Press 'a' for category A and 'b' for category B</p>",
+      on_finish: function(data){
+      data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(data.correct_response);
+  }
+
+    }
+
+        /* trials */
+      var test_trials = {
+      type: "categorize-image",
+      stimulus: jsPsych.timelineVariable('stimulus'),
+    
+      choices: [65, 66],
+      key_answer: jsPsych.timelineVariable('correct_key'),
+      data: jsPsych.timelineVariable('data'),
+      feedback_duration:0,
+      prompt: "<p style = font-size:120%>Press 'a' for category A and 'b' for category B</p>",
+      on_finish: function(data){
+      data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(data.correct_response);
+  }
+
+    }
+
+    var train_instructions = {
+      type: "html-keyboard-response",
+      stimulus: "<p>This is the training phase of the experiment. Feedback will be provided after each trial in this session. The total number of trials in this phase are 200.<br>Press any key to begin.</p>",
+    };
+    timeline.push(train_instructions);
+
+    var train_procedure = {
+      timeline: [fixation, train_trials],
+      timeline_variables: train_stimuli,
+      randomize_order: true,
+      repetitions: 20 //Total 20*10 = 200 trials
+    }
+
+    timeline.push(train_procedure);
+
+    var test_instructions = {
+      type: "html-keyboard-response",
+      stimulus: "<p>This is the testing phase of the experiment. Feedback will NOT be provided in this session. The total number of trials in this phase are 50.<br>Press any key to begin.</p>",
+    };
+    timeline.push(test_instructions);
+
+    var test_procedure_control = {
+      timeline: [fixation, test_trials],
+      timeline_variables: test_stimuli_control,
+      randomize_order: true,
+      repetitions: 5 //Total 10*5 = 50 trials
+    }
+
+    var test_procedure_exp = {
+      timeline: [fixation, test_trials],
+      timeline_variables: test_stimuli_exp,
+      randomize_order: true,
+      repetitions: 5 //Total 10*5 = 50 trials
+    }
+
+  
+    if(exp == true){
+      timeline.push(test_procedure_exp)
+    }
+    else{ 
+    timeline.push(test_procedure_control)
+  }
+
+
+    var debrief_block = {
+    type: "html-keyboard-response",
+    stimulus: function() {
+
+  
+
+
+    var trials = jsPsych.data.get().filter({total: 'exp'});
+    var correct_trials = trials.filter({correct: true});
+    var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
+    var rt = Math.round(correct_trials.select('rt').mean());
+
+    return "<p>You responded correctly on "+accuracy+"% of the trials.</p>"+
+    "<p>Your average response time was "+rt+"ms.</p>"+
+    "<p>Press any key to complete the experiment and get your data saved</p>"+
+    "<p>Thank you!</p>"
+  
+    
+    
+
+  }
+};
+
+    timeline.push(debrief_block)
+
+    /* start the experiment */
+    jsPsych.init({
+      show_progress_bar: true,
+      
+      timeline: timeline,
+      preload_images: images,
+
+      on_finish: function() {
+          var formData = new FormData();
+          formData.append("fname", `${id}_data_prototype_exp.json`);
+          formData.append("data", jsPsych.data.get().json());
+          var request = new XMLHttpRequest();
+          request.open('POST', 'action.php', true);
+          request.send(formData);
+          alert("Thank you");
+          jsPsych.data.get().localSave('json',`${id}_data_prototype_exp.json`);
+    
+  }
+    });
+  </script>
+
+
+
+  </html>
